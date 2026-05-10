@@ -1,121 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
+import './Login.css';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [id, setId] = useState('');
+  const [senha, setSenha] = useState('');
+  const navigate = useNavigate();
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const tokenSalvo = localStorage.getItem('token');
+    if (tokenSalvo) {
+      setToken(tokenSalvo);
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Tentando logar com ID:', id, 'Senha:', senha);
+
+    try {
+      const resposta = await axios.post('http://localhost:3331/login', {
+        id,
+        senha,
+      });
+
+      const tokenRetornado = resposta.data?.token;
+      if (tokenRetornado) {
+        localStorage.setItem('token', tokenRetornado);
+        setToken(tokenRetornado);
+      }
+
+      if (resposta.data?.cargo === 'garcom') {
+        navigate('/mesas');
+      } else {
+        navigate('/contact');
+      }
+    } catch (erro) {
+      console.error('Erro ao fazer login:', erro);
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="login-container">
+      <div className="login-card">
+        
+        <header className="login-header">
+          <div className="chef-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path>
+              <line x1="6" y1="17" x2="18" y2="17"></line>
+            </svg>
+          </div>
+        </header>
 
-      <div className="ticks"></div>
+        <h1 className="login-title">SEJA BEM-VINDO</h1>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="id">ID:</label>
+            <input 
+              type="text" 
+              id="id" 
+              placeholder="Digite seu id..." 
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+            />
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <div className="input-group">
+            <label htmlFor="senha">SENHA:</label>
+            <input 
+              type="password" 
+              id="senha" 
+              placeholder="Digite sua senha..." 
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+          </div>
+
+          <button type="submit" className="btn-entrar">
+            ENTRAR
+          </button>
+        </form>
+
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
