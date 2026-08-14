@@ -1,6 +1,7 @@
 <div align="center">
-
-# 🍽️ Restaurante Front
+<img src="https://raw.githubusercontent.com/michaelluisss/restaurante-api/master/logo.png" width="80" alt="Logo"/>
+  
+#  Restaurante Front
 
 **Interface web para sistema de gestão de restaurante**
 
