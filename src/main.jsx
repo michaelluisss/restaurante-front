@@ -1,10 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.jsx'
 import Cardapio from './pages/cardapio.jsx'
 import Contact from './pages/contact.jsx'
 import Mesas from './pages/mesas.jsx'
+import Pedidos from './pages/pedidos.jsx'
+import Cozinha from './pages/cozinha.jsx'
 
 
 import{
@@ -28,6 +29,12 @@ const router = createBrowserRouter([
   },{
     path: "/mesas",
     element: <Mesas />,
+  },{
+    path: "/pedidos",
+    element: <Pedidos />,
+  },{
+    path: "/cozinha",
+    element: <Cozinha />,
   }
 ]);
   

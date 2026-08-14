@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./cardapio.css";
 import longout from "../icons/longout.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Cardapio = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [itemQuantities, setItemQuantities] = useState({});
+  const mesaId = searchParams.get("mesaId");
+
 
   useEffect(() => {
     const fetchCardapio = async () => {
@@ -31,14 +35,16 @@ const Cardapio = () => {
     fetchCardapio();
   }, []);
 
-  const handleIncrement = (itemKey) => {
+  const handleIncrement = (itemId, itemName) => {
+    const itemKey = `${itemId}`;
     setItemQuantities((prev) => ({
       ...prev,
       [itemKey]: (prev[itemKey] || 0) + 1,
     }));
   };
 
-  const handleDecrement = (itemKey) => {
+  const handleDecrement = (itemId, itemName) => {
+    const itemKey = `${itemId}`;
     setItemQuantities((prev) => ({
       ...prev,
       [itemKey]: Math.max((prev[itemKey] || 0) - 1, 0),
@@ -104,7 +110,9 @@ const Cardapio = () => {
             </div>
           )}
 
-          {Object.entries(groupedItems).map(([categoria, categoriaItems]) => (
+          {Object.entries(groupedItems)
+            .filter(([categoria]) => categoria.toLowerCase() !== "sair")
+            .map(([categoria, categoriaItems]) => (
             <div key={categoria} className="categoria-section">
               <h2 className="categoria-title">{categoria}</h2>
               <div className="categoria-items">
@@ -113,23 +121,24 @@ const Cardapio = () => {
                   const descricao = item.detalhes || "Descrição do prato";
                   const disponivel = item.disponivel;
                   const valor = `R$ ${parseFloat(item.valor).toFixed(2)}`;
+                  const itemKey = `${item.id}`;
 
                   return (
-                    <article className="cardapio-item" key={`${nome}-${index}`}>
+                    <article className="cardapio-item" key={`${item.id}-${index}`}>
                       <div className="item-top">
                         <span className="item-name">{nome}</span>
                         <span className="item-price">{valor}</span>
                         <div className="quantity-controls">
                           <button 
                             className="btn-decrement"
-                            onClick={() => handleDecrement(`${nome}-${index}`)}
+                            onClick={() => handleDecrement(item.id, nome)}
                           >
                             −
                           </button>
-                          <span className="order-badge">{itemQuantities[`${nome}-${index}`] || 0}</span>
+                          <span className="order-badge">{itemQuantities[itemKey] || 0}</span>
                           <button 
                             className="btn-increment"
-                            onClick={() => handleIncrement(`${nome}-${index}`)}
+                            onClick={() => handleIncrement(item.id, nome)}
                           >
                             +
                           </button>
@@ -142,10 +151,17 @@ const Cardapio = () => {
               </div>
             </div>
           ))}
+          
         </div>
-
         <footer className="cardapio-footer">
-          <button className="btn-view-orders" type="button">
+          <button 
+            className="btn-view-orders" 
+            type="button"
+            onClick={() => {
+              const params = new URLSearchParams({ mesaId, itemQuantities: JSON.stringify(itemQuantities) });
+              navigate(`/pedidos?${params.toString()}`);
+            }}
+          >
             VER PEDIDOS
             <span className="order-badge">
               {Object.values(itemQuantities).reduce((a, b) => a + b, 0)}
