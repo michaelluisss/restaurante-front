@@ -17,7 +17,7 @@
 
 ## 📋 Sobre o Projeto
 
-Frontend do sistema de gestão para restaurante. Interface para garçons gerenciarem mesas, cardápio e pedidos com autenticação por cargo.
+Front-end do sistema de gestão para restaurante. Interface para garçons gerenciarem mesas, cardápio e pedidos com autenticação por cargo.
 
 ---
 
